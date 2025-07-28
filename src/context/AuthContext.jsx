@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState } from "react";
+// AuthContext.jsx MEJORADO
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -11,18 +13,31 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   const login = async (username, password) => {
     setIsLoading(true);
     setTimeout(() => {
       if (username === "admin" && password === "password") {
-        setUser({
+        const userData = {
           id: 1,
           username: "admin",
           name: "Administrador",
-        });
+        };
+        setUser(userData);
       }
       setIsLoading(false);
     }, 1000);
