@@ -1,9 +1,8 @@
-// AuthContext.jsx MEJORADO
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -13,30 +12,23 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
+  const [user, setUser, removeUser] = useLocalStorage("auth_user", null);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  }, [user]);
 
   const login = async (username, password) => {
     setIsLoading(true);
+
     setTimeout(() => {
       if (username === "admin" && password === "password") {
         const userData = {
           id: 1,
           username: "admin",
           name: "Administrador",
+          token: "fake-jwt-token-123",
+          roles: ["admin"],
+          loginTime: new Date().toISOString(),
         };
+
         setUser(userData);
       }
       setIsLoading(false);
@@ -44,16 +36,46 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
+    removeUser();
+  };
+
+  const updateProfile = (profileData) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...profileData,
+    }));
   };
 
   const value = {
     user,
     login,
     logout,
+    updateProfile,
     isLoading,
     isAuthenticated: !!user,
+    clearAuth: removeUser,
+    hasRole: (role) => user?.roles?.includes(role) || false,
+    getToken: () => user?.token || null,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuthStorage = () => {
+  const [authData, setAuthData, removeAuthData] = useLocalStorage("auth_data", {
+    rememberMe: false,
+    lastLoginTime: null,
+    preferences: {},
+  });
+
+  return {
+    authData,
+    setAuthData,
+    removeAuthData,
+    updatePreferences: (prefs) =>
+      setAuthData((prev) => ({
+        ...prev,
+        preferences: { ...prev.preferences, ...prefs },
+      })),
+  };
 };
