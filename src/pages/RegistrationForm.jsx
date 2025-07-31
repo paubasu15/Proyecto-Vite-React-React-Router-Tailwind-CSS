@@ -125,16 +125,18 @@ const RegistrationForm = () => {
           </InputGroup>
 
           {values.country === 'Mexico' && (
-            <InputGroup
-              label="Teléfono (México)"
-              name="phone"
-              value={values.phone}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.phone}
-              touched={touched.phone}
-              placeholder="10 dígitos"
-            />
+            <div className="mb-4">
+              <InputGroup
+                label="Teléfono (México)"
+                name="phone"
+                value={values.phone}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.phone}
+                touched={touched.phone}
+                placeholder="10 dígitos"
+              />
+            </div>
           )}
 
           <InputGroup

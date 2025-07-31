@@ -89,7 +89,7 @@ export default {
       try {
         if (value) new URL(value);
         return null;
-      } catch (_) {
+      } catch {
         return message;
       }
     },

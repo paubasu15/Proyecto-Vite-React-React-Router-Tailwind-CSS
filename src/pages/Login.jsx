@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useForm from '../hooks/useForm';
-import basic from '../validators/basicValidators';
+import basic from '../Validators/basicValidators';
 import InputGroup from '../components/InputGroup';
 
 const Login = () => {

@@ -1,8 +1,17 @@
-import { createContext, useContext, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useCallback,
+} from 'react';
+import PropTypes from 'prop-types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -15,56 +24,69 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser, removeUser] = useLocalStorage('auth_user', null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = async (username, password) => {
-    setIsLoading(true);
+  const login = useCallback(
+    async (username, password) => {
+      setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    if (username === 'admin' && password === 'password') {
-      const userData = {
-        id: 1,
-        username: 'admin',
-        name: 'Administrador',
-        token: 'fake-jwt-token-123',
-        roles: ['admin'],
-        loginTime: new Date().toISOString(),
-      };
+      if (username === 'admin' && password === 'password') {
+        const userData = {
+          id: 1,
+          username: 'admin',
+          name: 'Administrador',
+          token: 'fake-jwt-token-123',
+          roles: ['admin'],
+          loginTime: new Date().toISOString(),
+        };
 
-      setUser(userData);
+        setUser(userData);
+        setIsLoading(false);
+        return Promise.resolve();
+      }
+
       setIsLoading(false);
-      return Promise.resolve();
-    }
+      return Promise.reject(new Error('Credenciales inválidas'));
+    },
+    [setUser, setIsLoading]
+  );
 
-    setIsLoading(false);
-    return Promise.reject(new Error('Credenciales inválidas'));
-  };
-
-  const logout = () => {
+  const logout = useCallback(() => {
     removeUser();
-  };
+  }, [removeUser]);
 
-  const updateProfile = (profileData) => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      ...profileData,
-    }));
-  };
+  const updateProfile = useCallback(
+    (profileData) => {
+      setUser((prevUser) => ({
+        ...prevUser,
+        ...profileData,
+      }));
+    },
+    [setUser]
+  );
 
-  const value = {
-    user,
-    login,
-    logout,
-    updateProfile,
-    isLoading,
-    isAuthenticated: !!user,
-    clearAuth: removeUser,
-    hasRole: (role) => user?.roles?.includes(role) || false,
-    getToken: () => user?.token || null,
-  };
-
+  const value = useMemo(
+    () => ({
+      user,
+      login,
+      logout,
+      updateProfile,
+      isLoading,
+      isAuthenticated: !!user,
+      clearAuth: removeUser,
+      hasRole: (role) => user?.roles?.includes(role) || false,
+      getToken: () => user?.token || null,
+    }),
+    [user, login, logout, updateProfile, isLoading, removeUser]
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuthStorage = () => {
   const [authData, setAuthData, removeAuthData] = useLocalStorage('auth_data', {
     rememberMe: false,

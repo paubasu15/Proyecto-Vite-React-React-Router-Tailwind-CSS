@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -51,8 +51,8 @@ const ProductDetail = () => {
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-2">Especificaciones</h3>
             <ul className="list-disc list-inside text-gray-700">
-              {product.specifications.map((spec, index) => (
-                <li key={index}>{spec}</li>
+              {product.specifications.map((spec) => (
+                <li key={spec}>{spec}</li>
               ))}
             </ul>
           </div>

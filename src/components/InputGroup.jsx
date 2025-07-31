@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const InputGroup = ({
   label,
@@ -56,6 +57,18 @@ const InputGroup = ({
       {hasError && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
   );
+};
+InputGroup.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChange: PropTypes.func,
+  onBlur: PropTypes.func,
+  error: PropTypes.string,
+  touched: PropTypes.bool,
+  children: PropTypes.node,
+  placeholder: PropTypes.string,
 };
 
 export default InputGroup;
