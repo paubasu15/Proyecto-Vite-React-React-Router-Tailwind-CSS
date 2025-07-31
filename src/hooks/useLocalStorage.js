@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 /**
  * Hook personalizado para manejar localStorage de forma reactiva
@@ -11,7 +11,7 @@ export const useLocalStorage = (key, initialValue) => {
   // Pasamos una función de inicialización a useState para que la lógica
   // solo se ejecute una vez
   const [storedValue, setStoredValue] = useState(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return initialValue;
     }
 
@@ -38,7 +38,7 @@ export const useLocalStorage = (key, initialValue) => {
       setStoredValue(valueToStore);
 
       // Guardar en localStorage
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
@@ -53,7 +53,7 @@ export const useLocalStorage = (key, initialValue) => {
       setStoredValue(initialValue);
 
       // Eliminar de localStorage
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
       }
     } catch (error) {
@@ -73,7 +73,7 @@ export const useLocalStorageAdvanced = (key, initialValue, options = {}) => {
   } = options;
 
   const [storedValue, setStoredValue] = useState(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return initialValue;
     }
 
@@ -92,12 +92,12 @@ export const useLocalStorageAdvanced = (key, initialValue, options = {}) => {
         value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
 
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, serialize(valueToStore));
 
         // Disparar evento personalizado para sincronización
         if (syncData) {
-          window.dispatchEvent(new Event("local-storage-update"));
+          window.dispatchEvent(new Event('local-storage-update'));
         }
       }
     } catch (error) {
@@ -109,11 +109,11 @@ export const useLocalStorageAdvanced = (key, initialValue, options = {}) => {
     try {
       setStoredValue(initialValue);
 
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
 
         if (syncData) {
-          window.dispatchEvent(new Event("local-storage-update"));
+          window.dispatchEvent(new Event('local-storage-update'));
         }
       }
     } catch (error) {
@@ -123,7 +123,7 @@ export const useLocalStorageAdvanced = (key, initialValue, options = {}) => {
 
   // Sincronizar entre pestañas/ventanas
   useEffect(() => {
-    if (!syncData || typeof window === "undefined") return;
+    if (!syncData || typeof window === 'undefined') return;
 
     const handleStorageChange = (e) => {
       if (e.key === key && e.newValue !== null) {
@@ -149,13 +149,13 @@ export const useLocalStorageAdvanced = (key, initialValue, options = {}) => {
     };
 
     // Escuchar cambios en localStorage (entre pestañas)
-    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange);
     // Escuchar evento personalizado (misma pestaña)
-    window.addEventListener("local-storage-update", handleCustomUpdate);
+    window.addEventListener('local-storage-update', handleCustomUpdate);
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("local-storage-update", handleCustomUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('local-storage-update', handleCustomUpdate);
     };
   }, [key, initialValue, deserialize, syncData]);
 
